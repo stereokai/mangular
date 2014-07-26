@@ -1,9 +1,19 @@
+# =========================
+# Dev
+# =========================
+
 node_modules/
 bower_components/
+*.bak
 *.log
+*.iml
 
 build/
 dist/
+
+.tmp
+.sass-cache
+.idea
 
 # =========================
 # Operating System Files
@@ -17,7 +27,8 @@ dist/
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -44,3 +55,17 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+# =========================
+# Other stuff
+# =========================
+
+# Archives
+*.zip
+*.rar
+*.tar*
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
