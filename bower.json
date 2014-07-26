@@ -1,0 +1,52 @@
+{
+  "name": "mangularco",
+  "version": "0.0.0",
+  "appPath": "app",
+  "dependencies": {
+    "angular": "1.2.16",
+    "bootstrap-sass-official": "~3.2.0",
+    "angular-resource": "1.2.16",
+    "angular-cookies": "1.2.16",
+    "angular-sanitize": "1.2.16",
+    "angular-animate": "1.2.16",
+    "angular-touch": "1.2.16",
+    "angular-route": "1.2.16",
+    "angular-unicorn-directive": "~0.0.2"
+    "angular-highlightjs": "~0.3.0",
+  },
+  "devDependencies": {
+    "angular-mocks": "1.2.16",
+    "angular-scenario": "1.2.16"
+  },
+  "overrides": {
+    "angular": {
+      "main": "bower.json"
+    },
+    "bootstrap-sass-official": {
+      "main": [
+        "assets/stylesheets/bootstrap/variables.scss",
+        "assets/stylesheets/bootstrap/mixins.scss",
+        "assets/stylesheets/bootstrap/normalize.scss",
+        "assets/stylesheets/bootstrap/print.scss",
+        "assets/stylesheets/bootstrap/glyphicons.scss",
+        "assets/stylesheets/bootstrap/scaffolding.scss",
+        "assets/stylesheets/bootstrap/type.scss",
+        "assets/stylesheets/bootstrap/code.scss",
+        "assets/stylesheets/bootstrap/grid.scss",
+        "assets/stylesheets/bootstrap/tables.scss",
+        "assets/stylesheets/bootstrap/forms.scss",
+        "assets/stylesheets/bootstrap/buttons.scss",
+        "assets/stylesheets/bootstrap/navs.scss",
+        "assets/stylesheets/bootstrap/utilities.scss",
+        "assets/stylesheets/bootstrap/responsive-utilities.scss",
+        "assets/fonts/bootstrap/glyphicons-halflings-regular.eot",
+        "assets/fonts/bootstrap/glyphicons-halflings-regular.svg",
+        "assets/fonts/bootstrap/glyphicons-halflings-regular.ttf",
+        "assets/fonts/bootstrap/glyphicons-halflings-regular.woff"
+      ]
+    },
+    "angular-highlightjs": {
+      "dependencies": {}
+    }
+  }
+}
