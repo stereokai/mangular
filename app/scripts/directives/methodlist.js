@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name mangularcoApp.directive:methodList
+ * @name mangular.directive:methodList
  * @description
  * # methodList
  */
-angular.module('mangularCoApp')
+angular.module('mangular')
   .directive('methodList', ['methodList', function (methodList) {
     return {
       restrict: 'C',

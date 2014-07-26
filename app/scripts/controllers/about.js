@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc function
- * @name mangularCoApp.controller:AboutCtrl
+ * @name mangular.controller:AboutCtrl
  * @description
  * # AboutCtrl
- * Controller of the mangularCoApp
+ * Controller of the mangular
  */
-angular.module('mangularCoApp')
+angular.module('mangular')
   .controller('AboutCtrl', function ($scope) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',

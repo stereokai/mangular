@@ -3,7 +3,7 @@
 describe('Service: methodList', function () {
 
   // load the service's module
-  beforeEach(module('mangularcoApp'));
+  beforeEach(module('mangular'));
 
   // instantiate service
   var methodList;

@@ -79,7 +79,7 @@ module.exports = function (grunt) {
         middleware: function (connect, options) {
           var optBase = (typeof options.base === 'string') ? [options.base] : options.base,
               middleware = [require('connect-modrewrite')(['!(\\..+)$ / [L]'])]
-                .concat(optBase.map(function (path) { 
+                .concat(optBase.map(function (path) {
                   if (path.indexOf('rewrite|') === -1) {
                     return connect.static(path);
                   } else {
@@ -243,6 +243,7 @@ module.exports = function (grunt) {
           '<%= yeoman.dist %>/scripts/**/*.js',
           '<%= yeoman.dist %>/styles/**/*.css',
           '<%= yeoman.dist %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}',
+          '<%= yeoman.dist %>/libs/**/*.{js,css,png,jpg,jpeg,gif,webp,svg,woff,ttf}',
           '<%= yeoman.dist %>/styles/fonts/*'
         ]
       }

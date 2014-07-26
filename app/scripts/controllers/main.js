@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc function
- * @name mangularCoApp.controller:MainCtrl
+ * @name mangular.controller:MainCtrl
  * @description
  * # MainCtrl
- * Controller of the mangularCoApp
+ * Controller of the mangular
  */
-angular.module('mangularCoApp')
+angular.module('mangular')
   .controller('MainCtrl', function ($scope) {
     $scope.$on('api-apiReady', function () {
       $scope.api = arguments[1];

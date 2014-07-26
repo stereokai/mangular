@@ -3,7 +3,7 @@
 describe('Directive: searchField', function () {
 
   // load the directive's module
-  beforeEach(module('mangularcoApp'));
+  beforeEach(module('mangular'));
 
   var element,
     scope;

@@ -43,7 +43,7 @@
               api.providers.push({
                 name: value.name || key + 'Provider',
                 constructor: value
-              }); 
+              });
             }
           } else if (delegate === 'factory') {
             if (value) {
@@ -163,9 +163,9 @@
                 obj[property]['_name'] = name;
 
                 if (Object.getOwnPropertyNames(obj[property]).length > 6) {
-                  getProps(obj[property], true);  
+                  getProps(obj[property], true);
                 }
-                
+
                 subResult.push(obj[property]);
                 if (addName && nameAdded) { name = name.substring(0, name.lastIndexOf('.')); }
               }
@@ -174,10 +174,10 @@
 
         }
       }
-        
+
     </script>
   </head>
-  <body ng-app="mangularCoApp">
+  <body ng-app="mangular">
     <!-- Add your site or application content here -->
     <div class="container">
       <div class="header">
@@ -208,7 +208,7 @@
     </script>
 
     <!-- build:js(.) scripts/vendor.js -->
-    <script src="libs/angular/angular.js"></script>
+    <script src="app/libs/angular/angular.js"></script>
 
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -218,11 +218,11 @@
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/angular-touch/angular-touch.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
-    <script src="bower_components/angular-unicorn-directive/unicorn.js"></script>
     <script src="bower_components/angular-highlightjs/angular-highlightjs.js"></script>
+    <script src="bower_components/angular-unicorn-directive/unicorn.js"></script>
     <!-- endbower -->
 
-    <script src="libs/highlightjs/highlight.pack.js"></script>
+    <script src="app/libs/highlightjs/highlight.pack.js"></script>
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->

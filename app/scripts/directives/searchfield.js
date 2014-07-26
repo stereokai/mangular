@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name mangularcoApp.directive:searchField
+ * @name mangular.directive:searchField
  * @description
  * # searchField
  */
-angular.module('mangularCoApp')
+angular.module('mangular')
   .directive('searchField', function () {
     return {
       restrict: 'A',

@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc service
- * @name mangularcoApp.methodList
+ * @name mangular.methodList
  * @description
  * # methodList
- * Factory in the mangularcoApp.
+ * Factory in the mangular.
  */
-angular.module('mangularCoApp')
+angular.module('mangular')
   .factory('methodList', function () {
     return {};
   });

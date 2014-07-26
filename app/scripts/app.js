@@ -2,14 +2,14 @@
 
 /**
  * @ngdoc overview
- * @name mangularCoApp
+ * @name mangular
  * @description
- * # mangularCoApp
+ * # mangular
  *
  * Main module of the application.
  */
 angular
-  .module('mangularCoApp', [
+  .module('mangular', [
     'ngAnimate',
     'ngCookies',
     'ngResource',
