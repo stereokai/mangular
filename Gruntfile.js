@@ -421,6 +421,23 @@ module.exports = function (grunt) {
         configFile: 'test/karma.conf.js',
         singleRun: true
       }
+    },
+
+    shell: {
+      deployverbose: {
+        command: 'sh deploy.sh -v',
+        options: {
+            stdout: true,
+            stderr: true
+        }
+      },
+      deploy: {
+        command: 'sh deploy.sh',
+        options: {
+            stdout: true,
+            stderr: true
+        }
+      }
     }
   });
 
@@ -453,22 +470,32 @@ module.exports = function (grunt) {
     'karma'
   ]);
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'wiredep',
-    'useminPrepare',
-    'concurrent:dist',
-    'autoprefixer',
-    'concat',
-    'ngmin',
-    'copy:dist',
-    'cdnify',
-    'cssmin',
-    'uglify',
-    'filerev',
-    'usemin',
-    'htmlmin'
-  ]);
+  grunt.registerTask('build',
+    "Build & deploy",
+    function (target) {
+      var tasks = [
+        'clean:dist',
+        'wiredep',
+        'useminPrepare',
+        'concurrent:dist',
+        'autoprefixer',
+        'concat',
+        'ngmin',
+        'copy:dist',
+        'cdnify',
+        'cssmin',
+        'uglify',
+        'filerev',
+        'usemin',
+        'htmlmin'
+      ];
+
+      if (target.indexOf('deploy') > -1) {
+        tasks.push('deploy')
+      }
+
+      grunt.task.run(tasks);
+  });
 
   // Remove all cache and temp files
   grunt.registerTask('wipe', [
@@ -486,4 +513,12 @@ module.exports = function (grunt) {
     'test',
     'build'
   ]);
+
+  grunt.registerTask('deploy', 'standalone deploy command', function () {
+    if (grunt.option.flags().indexOf('--verbose') > -1) {
+      grunt.task.run('shell:deployverbose');
+    } else {
+      grunt.task.run('shell:deploy');
+    }
+  });
 };

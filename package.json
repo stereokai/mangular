@@ -31,7 +31,8 @@
     "karma": "~0.12.17",
     "karma-jasmine": "~0.1.5",
     "grunt-karma": "~0.8.3",
-    "connect-modrewrite": "~0.7.6"
+    "connect-modrewrite": "~0.7.6",
+    "grunt-shell": "~0.7.0"
   },
   "engines": {
     "node": ">=0.10.0"
