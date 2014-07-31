@@ -244,7 +244,7 @@ module.exports = function (grunt) {
           '<%= yeoman.dist %>/styles/**/*.css',
           '<%= yeoman.dist %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}',
           '<%= yeoman.dist %>/libs/**/*.{js,css,png,jpg,jpeg,gif,webp,svg,woff,ttf}',
-          '<%= yeoman.dist %>/styles/fonts/*'
+          //'<%= yeoman.dist %>/styles/fonts/*'
         ]
       }
     },
@@ -442,7 +442,6 @@ module.exports = function (grunt) {
     }
   });
 
-
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
     if (target === 'dist') {
       return grunt.task.run(['build', 'connect:dist:keepalive']);
@@ -491,7 +490,7 @@ module.exports = function (grunt) {
         'htmlmin'
       ];
 
-      if (target.indexOf('deploy') > -1) {
+      if (target && target.indexOf('deploy') > -1) {
         tasks.push('deploy')
       }
 
