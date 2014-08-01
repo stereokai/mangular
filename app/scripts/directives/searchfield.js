@@ -11,6 +11,12 @@ angular.module('mangular')
     return {
       restrict: 'A',
       link: function searchField ($scope, $el, $attrs) {
+        $scope.keypress = function (e) {
+          if (e.keyCode || e.which === 13) {
+            e.preventDefault();
+          }
+        }
+
         $el.on('input', function () {
           if (this.value) {
             methodList.show();

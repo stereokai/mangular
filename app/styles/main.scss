@@ -129,6 +129,27 @@ body {
   color: #f8f8f2;
 }
 
+::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #f8f8f2;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    #f8f8f2;
+    opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    #f8f8f2;
+    opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color:    #f8f8f2;
+}
+
+[type="search"] {
+    -moz-appearance:    textfield;
+    -webkit-appearance: textfield;
+    appearance: textfield;
+}
+
 .filter-prefix {
   float: left;
 }

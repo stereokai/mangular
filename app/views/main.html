@@ -1,6 +1,12 @@
 <p class="filter-box">
   <label class="filter-prefix">&gt;</label>
-  <input search-field type="search" ng-model="q._name" placeholder="Search for api method" class="filter-input" />
+  <input search-field
+    class="filter-input"
+    type="search"
+    ng-model="q._name"
+    ng-keypress="keypress($event)"
+    placeholder="Search for api method"
+     />
 </p>
 
 <div>
@@ -23,8 +29,7 @@
   </ul>
 </div>
 
-<div>
-  <pre>
+<code-view>awdwadwa</code-view>
+<!--   <pre>
     {{selectedMethod.method.toString()}}
-  </pre>
-</div>
+  </pre> -->
