@@ -17,13 +17,20 @@
   <body ng-app="mangular">
     <!-- Add your site or application content here -->
     <div class="container">
+      <div class="shadow-decoration first"></div>
+      <div class="shadow-decoration second"></div>
+
       <div class="header row">
         <div class="col-md-4">
-          <img class="header-logo" src="/images/mangular_logo.svg"></img>
+          <img class="header-logo" src=" /images/mangular_logo.svg"></img>
+        </div>
+        <div class="col-md-8">
+          &nbsp;
+          <h3 class="header-title">A kickass AngularJS browser</h3>
         </div>
       </div>
 
-      <div ng-view=""></div>
+      <div class="main row" ng-view=""></div>
 
       <div class="footer">
       </div>
@@ -45,7 +52,6 @@
     <script src="libs/angular/angular.js"></script>
 
     <!-- bower:js -->
-    <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>

@@ -1,1 +1,30 @@
-<img class="centered" src="/images/mangular_logo.svg"></img>
+<p class="filter-box">
+  <label class="filter-prefix">&gt;</label>
+  <input search-field type="search" ng-model="q._name" placeholder="Search for api method" class="filter-input" />
+</p>
+
+<div>
+  <ul class="method-list list-group" data-list>
+    <li class="list-group-item" ng-repeat="method in api.services | filter:q track by method._name" ng-click="doIt(this)">
+      {{method._name}} - service
+    </li>
+    <li class="list-group-item" ng-repeat="method in api.providers | filter:q track by method._name" ng-click="doIt(this)">
+      {{method._name}} - provider
+    </li>
+    <li class="list-group-item" ng-repeat="method in api.directives | filter:q track by method._name" ng-click="doIt(this)">
+      {{method._name}} - directive
+    </li>
+    <li class="list-group-item" ng-repeat="method in api.factories | filter:q track by method._name" ng-click="doIt(this)">
+      {{method._name}} - factory
+    </li>
+    <li class="list-group-item" ng-repeat="method in api.publicApi | filter:q track by method._name" ng-click="doIt(this)">
+      {{method._name}} - public API
+    </li>
+  </ul>
+</div>
+
+<div>
+  <pre>
+    {{selectedMethod.method.toString()}}
+  </pre>
+</div>

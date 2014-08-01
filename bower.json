@@ -37,6 +37,7 @@
         "assets/stylesheets/bootstrap/forms.scss",
         "assets/stylesheets/bootstrap/buttons.scss",
         "assets/stylesheets/bootstrap/navs.scss",
+        "assets/stylesheets/bootstrap/_list-group.scss",
         "assets/stylesheets/bootstrap/utilities.scss",
         "assets/stylesheets/bootstrap/responsive-utilities.scss",
         "assets/fonts/bootstrap/glyphicons-halflings-regular.eot",

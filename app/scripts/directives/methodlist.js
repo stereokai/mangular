@@ -7,11 +7,11 @@
  * # methodList
  */
 angular.module('mangular')
-  .directive('methodList', ['methodList', function (methodList) {
+  .directive('methodList', function ($document, methodList) {
     return {
       restrict: 'C',
       controller: function () {},
-      link: function methodList ($scope, $el, $attrs, methodListCtrl) {
+      link: function methodListLinker ($scope, $el, $attrs, methodListCtrl) {
         $scope.doIt = function (method) {
           $scope.selectedMethod = method;
           window.selectedMethod = method.method.toString()
@@ -22,6 +22,7 @@ angular.module('mangular')
         };
 
         methodListCtrl.hide = function () {
+          console.log('hihi')
           $el[0].style.display = 'none';
         };
 
@@ -34,6 +35,15 @@ angular.module('mangular')
             methodList[method] = methodListCtrl[method];
           }
         }
+
+        $el.on('click', methodList.hide);
+        $document
+          .off('click', methodList.hide)
+          .on('click', methodList.hide);
+
+        $scope.$on('$destroy', function () {
+          $document.off('click', methodList.hide);
+        });
       }
     }
-  }]);
+  });

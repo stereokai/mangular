@@ -7,19 +7,19 @@
  * # searchField
  */
 angular.module('mangular')
-  .directive('searchField', function () {
+  .directive('searchField', function ($timeout, methodList) {
     return {
       restrict: 'A',
       link: function searchField ($scope, $el, $attrs) {
         $el.on('input', function () {
           if (this.value) {
-            dataList.show();
+            methodList.show();
           } else {
-            dataList.hide();
+            methodList.hide();
           }
 
           $timeout(function () {
-            $scope.selectedMethod = dataList.getFirstItem();
+            $scope.selectedMethod = methodList.getFirstItem();
           }, 0);
         });
       }
