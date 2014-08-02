@@ -1,4 +1,6 @@
 (function (global) {
+  'use strict';
+
   var unicorn = RegExp.prototype.test.bind(/unicorn/),
       registrationIsClosed = false,
 
@@ -8,7 +10,7 @@
         factories: [],
         directives: [],
         publicApi: []
-      };
+      },
 
       FACTORY = 'Factory',
       SERVICE = 'Service',
@@ -25,7 +27,7 @@
     var match;
 
     if (key && typeof key === 'object') {
-      for (i in key) {
+      for (var i in key) {
         registerObject(delegate, i, key[i]);
       }
     } else {
@@ -70,18 +72,17 @@
 
       registerMethods();
 
-      var API = []
-        .concat(api.services)
-        .concat(api.directives)
-        .concat(api.providers)
-        .concat(api.factories)
-        .concat(api.publicApi);
-
-      window.api = API;
+      api = Array.prototype.concat(
+        api.services,
+        api.directives,
+        api.providers,
+        api.factories,
+        api.publicApi
+      );
 
       injector.invoke(function ($rootScope, appInitPromise) {
         appInitPromise.promise.then(function () {
-          $rootScope.$broadcast('api-apiReady', window.api);
+          $rootScope.$broadcast('api-apiReady', api);
         })
       });
     }, 0);
@@ -112,7 +113,7 @@
     api.providers = findMethods(api.providers, PROVIDER);
     api.factories = findMethods(api.factories, FACTORY);
 
-    for (method in angular) {
+    for (var method in angular) {
       if (angular.hasOwnProperty(method) && angular.isFunction(angular[method])) {
         api.publicApi.push(prepareApiMethod(method))
       }

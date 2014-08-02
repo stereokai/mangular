@@ -13,6 +13,6 @@ angular.module('mangular')
     $scope.$on('api-apiReady', function () {
       $scope.api = arguments[1];
       //$scope.$digest();
-      $scope.selectedMethod = api[0]
+      $scope.selectedMethod = $scope.api[0]
     });
   });
