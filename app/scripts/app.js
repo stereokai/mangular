@@ -40,4 +40,12 @@ angular
       .otherwise({
         redirectTo: '/'
       });
-  }]);
+  }])
+
+
+  .filter('camelCase', function () {
+    return function camelCase (name) {
+      var x = arguments;
+      debugger
+    }
+  });

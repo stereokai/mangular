@@ -7,7 +7,14 @@
       };
 
       var unicorn = RegExp.prototype.test.bind(/unicorn/),
-          registrationIsClosed = false;
+          registrationIsClosed = false,
+
+          FACTORY = 'Factory',
+          SERVICE = 'Service',
+          DIRECTIVE = 'Directive',
+          PROVIDER = 'Provider',
+          FILTER = 'Filter',
+          PUBLICAPI = 'Public API';
 
       function registerObject (delegate, key, value) {
         if (registrationIsClosed) { return; }
@@ -60,6 +67,15 @@
 
           registerMethods();
 
+          var API = []
+            .concat(api.services)
+            .concat(api.directives)
+            .concat(api.providers)
+            .concat(api.factories)
+            .concat(api.publicApi);
+
+          window.api = API;
+
           injector.invoke(['$rootScope', function ($rootScope) {
             $rootScope.$broadcast('api-apiReady', window.api);
           }]);
@@ -86,10 +102,10 @@
       };
 
       function registerMethods () {
-        api.services = findMethods(api.services);
-        api.directives = findMethods(api.directives);
-        api.providers = findMethods(api.providers);
-        api.factories = findMethods(api.factories);
+        api.services = findMethods(api.services, SERVICE);
+        api.directives = findMethods(api.directives, DIRECTIVE);
+        api.providers = findMethods(api.providers, PROVIDER);
+        api.factories = findMethods(api.factories, FACTORY);
 
         for (method in angular) {
           if (angular.hasOwnProperty(method) && angular.isFunction(angular[method])) {
@@ -104,11 +120,12 @@
         fn.toString = Function.prototype.toString.bind(angular[method]);
 
         fn._name = 'angular.' + method;
+        fn._type = PUBLICAPI;
 
         return fn;
       }
 
-      function findMethods (array) {
+      function findMethods (array, type) {
         var result = [];
 
         for (var i = 0, len = array.length, subResult, name; i < len; i++) {
@@ -140,7 +157,9 @@
                   }
                 }
 
-                obj[property]['_name'] = !obj[property].name ? (property === 'constructor' ? obj.name : property) : obj[property].name;
+                obj[property]['_name'] = !obj[property].name ?
+                  (property === 'constructor' ? obj.name : property) : obj[property].name;
+
                 if (addName) (name += (!!name ? '.' : '') + obj[property]._name);
                 nameAdded = true;
                 obj[property]['_name'] = name;
@@ -148,6 +167,8 @@
                 if (Object.getOwnPropertyNames(obj[property]).length > 6) {
                   getProps(obj[property], true);
                 }
+
+                obj[property]['_type'] = /^[a-zA-Z]+Filter/.test(name) ? FILTER : (addName ? type + ' method' : type);
 
                 subResult.push(obj[property]);
                 if (addName && nameAdded) { name = name.substring(0, name.lastIndexOf('.')); }

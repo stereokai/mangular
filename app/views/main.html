@@ -11,25 +11,13 @@
 
 <div>
   <ul class="method-list list-group" data-list>
-    <li class="list-group-item" ng-repeat="method in api.services | filter:q track by method._name" ng-click="doIt(this)">
-      {{method._name}} - service
-    </li>
-    <li class="list-group-item" ng-repeat="method in api.providers | filter:q track by method._name" ng-click="doIt(this)">
-      {{method._name}} - provider
-    </li>
-    <li class="list-group-item" ng-repeat="method in api.directives | filter:q track by method._name" ng-click="doIt(this)">
-      {{method._name}} - directive
-    </li>
-    <li class="list-group-item" ng-repeat="method in api.factories | filter:q track by method._name" ng-click="doIt(this)">
-      {{method._name}} - factory
-    </li>
-    <li class="list-group-item" ng-repeat="method in api.publicApi | filter:q track by method._name" ng-click="doIt(this)">
-      {{method._name}} - public API
+    <li class="list-group-item" ng-repeat="method in api | filter:q track by method._name" ng-click="doIt(this)">
+      {{method._name}} - {{method._type}}
     </li>
   </ul>
 </div>
 
-<code-view>awdwadwa</code-view>
-<!--   <pre>
+<!-- <code-view>awdwadwa</code-view> -->
+  <pre>
     {{selectedMethod.method.toString()}}
-  </pre> -->
+  </pre>

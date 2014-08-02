@@ -12,7 +12,7 @@ angular.module('mangular')
       restrict: 'A',
       link: function searchField ($scope, $el, $attrs) {
         $scope.keypress = function (e) {
-          if (e.keyCode || e.which === 13) {
+          if ((e.keyCode || e.which) === 13) {
             e.preventDefault();
           }
         }
