@@ -42,6 +42,7 @@ angular
       });
   }])
 
+  .run(function (appInitPromise) {})
 
   .filter('camelCase', function () {
     return function camelCase (name) {

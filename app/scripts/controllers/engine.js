@@ -1,4 +1,8 @@
-      window.api = {
+(function (global) {
+  var unicorn = RegExp.prototype.test.bind(/unicorn/),
+      registrationIsClosed = false,
+
+      api = {
         providers: [],
         services: [],
         factories: [],
@@ -6,175 +10,177 @@
         publicApi: []
       };
 
-      var unicorn = RegExp.prototype.test.bind(/unicorn/),
-          registrationIsClosed = false,
+      FACTORY = 'Factory',
+      SERVICE = 'Service',
+      DIRECTIVE = 'Directive',
+      PROVIDER = 'Provider',
+      FILTER = 'Filter',
+      PUBLICAPI = 'Public API';
 
-          FACTORY = 'Factory',
-          SERVICE = 'Service',
-          DIRECTIVE = 'Directive',
-          PROVIDER = 'Provider',
-          FILTER = 'Filter',
-          PUBLICAPI = 'Public API';
+  global.registerObject = registerObject;
 
-      function registerObject (delegate, key, value) {
-        if (registrationIsClosed) { return; }
+  function registerObject (delegate, key, value) {
+    if (registrationIsClosed) { return; }
 
-        var match;
+    var match;
 
-        if (key && typeof key === 'object') {
-          for (i in key) {
-            registerObject(delegate, i, key[i]);
-          }
-        } else {
-          if (delegate === 'provider') {
-            api.services.push(key);
-
-            if (value) {
-              api.providers.push({
-                name: value.name || key + 'Provider',
-                constructor: value
-              });
-            }
-          } else if (delegate === 'factory') {
-            if (value) {
-              if (Array.isArray(value)) { value = value[value.length - 1] };
-
-              if (match = key.match(/(.*)directive/i)) {
-                unicorn(key) && wrapUp() ||
-
-                api.directives.push({
-                  name: match[1],
-                  constructor: value
-                })
-              } else {
-                api.factories.push({
-                  name: key,
-                  constructor: value
-                });
-              }
-            }
-          }
-        }
+    if (key && typeof key === 'object') {
+      for (i in key) {
+        registerObject(delegate, i, key[i]);
       }
+    } else {
+      if (delegate === 'provider') {
+        api.services.push(key);
 
-      function wrapUp () {
-        registrationIsClosed = true;
+        if (value) {
+          api.providers.push({
+            name: value.name || key + 'Provider',
+            constructor: value
+          });
+        }
+      } else if (delegate === 'factory') {
+        if (value) {
+          if (Array.isArray(value)) { value = value[value.length - 1] };
 
-        setTimeout(function () {
-          var injector = angular.element(document.querySelector('body')).injector();
+          if (match = key.match(/(.*)directive/i)) {
+            unicorn(key) && wrapUp() ||
 
-          prepareServices(injector);
-
-          registerMethods();
-
-          var API = []
-            .concat(api.services)
-            .concat(api.directives)
-            .concat(api.providers)
-            .concat(api.factories)
-            .concat(api.publicApi);
-
-          window.api = API;
-
-          injector.invoke(['$rootScope', function ($rootScope) {
-            $rootScope.$broadcast('api-apiReady', window.api);
-          }]);
-        }, 0);
-
-        return true;
-      };
-
-      function prepareServices (injector) {
-        api.services.push(function () {
-          var apiServices = [], services = Array.prototype.slice.call(arguments, 0);
-
-          for (var i = 0, len = services.length; i < len; i++) {
-            apiServices.push({
-              name: api.services[i],
-              constructor: services[i]
+            api.directives.push({
+              name: match[1],
+              constructor: value
             })
-          };
-
-          api.services = apiServices;
-        });
-
-        injector.invoke(api.services);
-      };
-
-      function registerMethods () {
-        api.services = findMethods(api.services, SERVICE);
-        api.directives = findMethods(api.directives, DIRECTIVE);
-        api.providers = findMethods(api.providers, PROVIDER);
-        api.factories = findMethods(api.factories, FACTORY);
-
-        for (method in angular) {
-          if (angular.hasOwnProperty(method) && angular.isFunction(angular[method])) {
-            api.publicApi.push(prepareApiMethod(method))
+          } else {
+            api.factories.push({
+              name: key,
+              constructor: value
+            });
           }
         }
+      }
+    }
+  }
+
+  function wrapUp () {
+    registrationIsClosed = true;
+
+    setTimeout(function () {
+      var injector = angular.element(document.querySelector('body')).injector();
+
+      prepareServices(injector);
+
+      registerMethods();
+
+      var API = []
+        .concat(api.services)
+        .concat(api.directives)
+        .concat(api.providers)
+        .concat(api.factories)
+        .concat(api.publicApi);
+
+      window.api = API;
+
+      injector.invoke(function ($rootScope, appInitPromise) {
+        appInitPromise.promise.then(function () {
+          $rootScope.$broadcast('api-apiReady', window.api);
+        })
+      });
+    }, 0);
+
+    return true;
+  };
+
+  function prepareServices (injector) {
+    api.services.push(function () {
+      var apiServices = [], services = Array.prototype.slice.call(arguments, 0);
+
+      for (var i = 0, len = services.length; i < len; i++) {
+        apiServices.push({
+          name: api.services[i],
+          constructor: services[i]
+        })
       };
 
-      function prepareApiMethod (method) {
-        var fn = angular[method].bind({});
+      api.services = apiServices;
+    });
 
-        fn.toString = Function.prototype.toString.bind(angular[method]);
+    injector.invoke(api.services);
+  };
 
-        fn._name = 'angular.' + method;
-        fn._type = PUBLICAPI;
+  function registerMethods () {
+    api.services = findMethods(api.services, SERVICE);
+    api.directives = findMethods(api.directives, DIRECTIVE);
+    api.providers = findMethods(api.providers, PROVIDER);
+    api.factories = findMethods(api.factories, FACTORY);
 
-        return fn;
+    for (method in angular) {
+      if (angular.hasOwnProperty(method) && angular.isFunction(angular[method])) {
+        api.publicApi.push(prepareApiMethod(method))
       }
+    }
+  };
 
-      function findMethods (array, type) {
-        var result = [];
+  function prepareApiMethod (method) {
+    var fn = angular[method].bind({});
 
-        for (var i = 0, len = array.length, subResult, name; i < len; i++) {
-          subResult = [];
-          name = array[i].name;
-          getProps(array[i], false);
-          result = result.concat(subResult);
-        }
+    fn.toString = Function.prototype.toString.bind(angular[method]);
 
-        return result;
+    fn._name = 'angular.' + method;
+    fn._type = PUBLICAPI;
 
-        function getProps (obj, addName) {
-          var nameAdded = false;
-          for (var property in obj) {
-            if (obj.hasOwnProperty(property) && !!obj[property]) {
-              if (Array.isArray(obj[property].constructor)) {
-                getProps(obj[property], true);
-              } else if (typeof obj[property] === 'function') {
-                if (obj[property]['_name']) {
-                  var originalMethod = obj[property];
+    return fn;
+  }
 
-                  obj[property] = obj[property].bind({});
-                  obj[property].toString = Function.prototype.toString.bind(originalMethod);
+  function findMethods (array, type) {
+    var result = [];
 
-                  for (prop in originalMethod) {
-                    if (originalMethod.hasOwnProperty(prop) && prop !== 'prototype') {
-                      obj[property][prop] = originalMethod[prop];
-                    }
-                  }
+    for (var i = 0, len = array.length, subResult, name; i < len; i++) {
+      subResult = [];
+      name = array[i].name;
+      getProps(array[i], false);
+      result = result.concat(subResult);
+    }
+
+    return result;
+
+    function getProps (obj, addName) {
+      var nameAdded = false;
+      for (var property in obj) {
+        if (obj.hasOwnProperty(property) && !!obj[property]) {
+          if (Array.isArray(obj[property].constructor)) {
+            getProps(obj[property], true);
+          } else if (typeof obj[property] === 'function') {
+            if (obj[property]['_name']) {
+              var originalMethod = obj[property];
+
+              obj[property] = obj[property].bind({});
+              obj[property].toString = Function.prototype.toString.bind(originalMethod);
+
+              for (prop in originalMethod) {
+                if (originalMethod.hasOwnProperty(prop) && prop !== 'prototype') {
+                  obj[property][prop] = originalMethod[prop];
                 }
-
-                obj[property]['_name'] = !obj[property].name ?
-                  (property === 'constructor' ? obj.name : property) : obj[property].name;
-
-                if (addName) (name += (!!name ? '.' : '') + obj[property]._name);
-                nameAdded = true;
-                obj[property]['_name'] = name;
-
-                if (Object.getOwnPropertyNames(obj[property]).length > 6) {
-                  getProps(obj[property], true);
-                }
-
-                obj[property]['_type'] = /^[a-zA-Z]+Filter/.test(name) ? FILTER : (addName ? type + ' method' : type);
-
-                subResult.push(obj[property]);
-                if (addName && nameAdded) { name = name.substring(0, name.lastIndexOf('.')); }
               }
             }
-          }
 
+            obj[property]['_name'] = !obj[property].name ?
+              (property === 'constructor' ? obj.name : property) : obj[property].name;
+
+            if (addName) (name += (!!name ? '.' : '') + obj[property]._name);
+            nameAdded = true;
+            obj[property]['_name'] = name;
+
+            if (Object.getOwnPropertyNames(obj[property]).length > 6) {
+              getProps(obj[property], true);
+            }
+
+            obj[property]['_type'] = /^[a-zA-Z]+Filter/.test(name) ? FILTER : (addName ? type + ' method' : type);
+
+            subResult.push(obj[property]);
+            if (addName && nameAdded) { name = name.substring(0, name.lastIndexOf('.')); }
+          }
         }
       }
+
+    }
+  }
+})(window)
