@@ -17,7 +17,6 @@ angular
     'ngSanitize',
     'ngTouch',
     'unicorn-directive',
-    'hljs'
   ])
 
   .config(['$locationProvider', '$httpProvider', function ($locationProvider, $httpProvider) {
