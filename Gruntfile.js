@@ -38,6 +38,10 @@ module.exports = function (grunt) {
         files: ['bower.json'],
         tasks: ['wiredep']
       },
+      processhtml: {
+        files: ['<%= yeoman.app %>/**/*.html', '!<%= yeoman.app %>/index.html'],
+        tasks: ['processhtml:dev']
+      },
       js: {
         files: ['<%= yeoman.app %>/scripts/**/*.js'],
         tasks: ['newer:jshint:all'],
@@ -119,6 +123,27 @@ module.exports = function (grunt) {
       }
     },
 
+    // processhtml: {
+    //   dist: {
+    //     files: {
+    //       'dist/index.html': ['index.html']
+    //     }
+    //   }
+    // },
+
+    processhtml: {
+      dev: {
+        files: {
+          '<%= yeoman.app %>/index.html': ['<%= yeoman.app %>/_index.html']
+        }
+      },
+      dist: {
+        files: {
+          '<%= yeoman.app %>/index.html': ['<%= yeoman.app %>/_index.html']
+        }
+      }
+    },
+
     // Make sure code styles are up to par and there are no obvious mistakes
     jshint: {
       options: {
@@ -150,7 +175,7 @@ module.exports = function (grunt) {
           ]
         }]
       },
-      server: '.tmp',
+      server: ['.tmp', '<%= yeoman.app %>/index.html'],
       cache: {
         files: [{
           dot: true,
@@ -244,7 +269,7 @@ module.exports = function (grunt) {
           '<%= yeoman.dist %>/styles/**/*.css',
           '<%= yeoman.dist %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}',
           '<%= yeoman.dist %>/libs/**/*.{js,css,png,jpg,jpeg,gif,webp,svg,woff,ttf}',
-          //'<%= yeoman.dist %>/styles/fonts/*'
+          '<%= yeoman.dist %>/styles/fonts/*'
         ]
       }
     },
@@ -273,7 +298,11 @@ module.exports = function (grunt) {
       html: ['<%= yeoman.dist %>/**/*.html'],
       css: ['<%= yeoman.dist %>/styles/**/*.css'],
       options: {
-        assetsDirs: ['<%= yeoman.dist %>','<%= yeoman.dist %>/images']
+        assetsDirs: [
+          '<%= yeoman.dist %>',
+          '<%= yeoman.dist %>/images',
+          '<%= yeoman.dist %>/styles/fonts'
+        ]
       }
     },
 
@@ -449,6 +478,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
+      'processhtml:dev',
       'wiredep',
       'concurrent:server',
       'autoprefixer',
@@ -475,6 +505,7 @@ module.exports = function (grunt) {
     function (target) {
       var tasks = [
         'clean:dist',
+        'processhtml:dist',
         'wiredep',
         'useminPrepare',
         'concurrent:dist',
