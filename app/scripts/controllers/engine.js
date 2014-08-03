@@ -1,6 +1,6 @@
-(function (global) {
-  'use strict';
+'use strict';
 
+(function (global) {
   var unicorn = RegExp.prototype.test.bind(/unicorn/),
       registrationIsClosed = false,
 
@@ -80,11 +80,12 @@
         api.publicApi
       );
 
-      injector.invoke(function ($rootScope, appInitPromise) {
-        appInitPromise.promise.then(function () {
-          $rootScope.$broadcast('api-apiReady', api);
-        })
-      });
+      injector.invoke(['$rootScope', 'appInitPromise',
+        function ($rootScope, appInitPromise) {
+          appInitPromise.promise.then(function () {
+            $rootScope.$broadcast('api-apiReady', api);
+          })
+      }]);
     }, 0);
 
     return true;
@@ -184,4 +185,4 @@
 
     }
   }
-})(window)
+})(window);
