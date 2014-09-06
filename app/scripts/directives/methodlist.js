@@ -13,8 +13,8 @@ angular.module('mangular')
       controller: function () {},
       link: function methodListLinker ($scope, $el, $attrs, methodListCtrl) {
         $scope.doIt = function (method) {
-          $scope.selectedMethod = method;
-          window.selectedMethod = method.method.toString()
+          $scope.selectedMethod = method.method;
+          //window.selectedMethod = method;
         }
 
         methodListCtrl.show = function () {
@@ -22,7 +22,6 @@ angular.module('mangular')
         };
 
         methodListCtrl.hide = function () {
-          console.log('hihi')
           $el[0].style.display = 'none';
         };
 

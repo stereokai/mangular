@@ -12,7 +12,6 @@ angular.module('mangular')
     appInitPromise.resolve();
     $scope.$on('api-apiReady', function () {
       $scope.api = arguments[1];
-      //$scope.$digest();
-      $scope.selectedMethod = $scope.api[0]
+      $scope.selectedMethod = $scope.api[0];
     });
   });

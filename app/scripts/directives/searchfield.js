@@ -25,7 +25,7 @@ angular.module('mangular')
           }
 
           $timeout(function () {
-            $scope.selectedMethod = methodList.getFirstItem();
+            $scope.selectedMethod = methodList.getFirstItem().method;
           }, 0);
         });
       }
