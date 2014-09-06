@@ -80,6 +80,8 @@
         api.publicApi
       );
 
+      prettifyMethods();
+
       injector.invoke(['$rootScope', 'appInitPromise',
         function ($rootScope, appInitPromise) {
           appInitPromise.promise.then(function () {
@@ -182,7 +184,46 @@
           }
         }
       }
-
     }
+  }
+
+  function prettifyMethods () {
+    api = api.map(function (method) {
+      var code = method.toString(),
+          codeLines = code.split(/\r\n|\r|\n/),
+          totalLOC = codeLines.length,
+          trimOffset;
+
+      if (totalLOC > 1) {
+        trimOffset = Math.min(findTrimOffset(codeLines, totalLOC), 4);
+
+        // remove the exess white-space from the beginning of each line
+        codeLines = codeLines.map(function (line, idx) {
+          return idx && line.trim() && isNotUseStrict(line) ? line.slice(trimOffset) : line;
+        });
+
+        code = '';
+        for (var i = 0; i < totalLOC; i++) {
+          code += codeLines[i] + '\n';
+        }
+      }
+
+      method.code = code;
+      method.loc = totalLOC;
+
+      return method;
+    });
+  }
+
+  function findTrimOffset (codeLines, lastLine) {
+    for (var i = 1; i < lastLine; i++) {
+      if (codeLines[i].trim() && isNotUseStrict(codeLines[i])) {
+        return codeLines[i].match(/^\s*/)[0].length - 2;
+      }
+    }
+  }
+
+  function isNotUseStrict (code) {
+    return code.indexOf('use strict') === -1;
   }
 })(window);
