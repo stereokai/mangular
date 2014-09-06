@@ -1963,7 +1963,7 @@ function setupModuleLoader(window) {
         function invokeLater(provider, method, insertMethod, queue) {
           if (!queue) queue = invokeQueue;
           return function() {
-            console.log('invokeLater', method, arguments);
+            //console.log('invokeLater', method, arguments);
             queue[insertMethod || 'push']([provider, method, arguments]);
             return moduleInstance;
           };
@@ -3855,7 +3855,7 @@ function createInjector(modulesToLoad, strictDi) {
 
   function supportObject(delegate) {
     return function(key, value) {
-      console.log('supportObject', delegate.name, arguments)
+      //console.log('supportObject', delegate.name, arguments)
       registerObject(delegate.name, key, value)
 
       if (isObject(key)) {
