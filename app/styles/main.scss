@@ -210,3 +210,18 @@ body {
 .ace_editor {
   letter-spacing: 0.5pt !important;
 }
+
+.shine span {
+  color: #FDFFE3 !important;
+  text-shadow: 1px 0px 0px #BF7F00,
+               -1px 0px 0px #BF7F00,
+               2px 0px 1px rgba(191, 127, 0, 0.8),
+               -2px 0px 1px rgba(191, 127, 0, 0.8);
+
+  transition: text-shadow 300ms ease;
+}
+
+.ace_line {
+  width: 100%;
+  overflow: show;
+}
