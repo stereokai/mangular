@@ -202,3 +202,11 @@ body {
     border-bottom: 0;
   }
 }
+
+.ace-monokai, .ace_gutter {
+  background: none !important;
+}
+
+.ace_editor {
+  letter-spacing: 0.5pt !important;
+}

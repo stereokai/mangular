@@ -14,14 +14,25 @@ angular.module('mangular')
       replace: true,
       link: function postLink($scope, $el, $attrs) {
         var editor = ace.edit($el[0]),
+            session = editor.getSession(),
             styleEl = document.createElement('style'),
             editorStyleSheet;
 
         editor.setTheme('ace/theme/monokai');
-        editor.getSession().setMode('ace/mode/javascript');
-        editor.setReadOnly(true);
+        session.setMode('ace/mode/javascript');
 
-        window.editor = editor;
+        session.setUseWorker(false);
+        session.setUseWrapMode(true);
+        session.setWrapLimitRange();
+        session.setFoldStyle('manual');
+        session.setTabSize(2);
+
+        editor.setReadOnly(true);
+        editor.setShowPrintMargin(false);
+        editor.setOptions({
+          selectionStyle: 'text',
+          fontSize: '14px'
+        });
 
         // Apparently some version of Safari needs the following line? I dunno.
         styleEl.appendChild(document.createTextNode(''));
