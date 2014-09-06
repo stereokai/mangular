@@ -40,7 +40,7 @@ module.exports = function (grunt) {
       },
       processhtml: {
         files: ['<%= yeoman.app %>/**/*.html', '!<%= yeoman.app %>/index.html'],
-        tasks: ['processhtml:dev']
+        tasks: ['processhtml:dev', 'wiredep']
       },
       js: {
         files: ['<%= yeoman.app %>/scripts/**/*.js'],
