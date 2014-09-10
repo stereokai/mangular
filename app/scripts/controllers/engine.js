@@ -195,7 +195,7 @@
           trimOffset;
 
       if (totalLOC > 1) {
-        trimOffset = Math.min(findTrimOffset(codeLines, totalLOC), 4);
+        trimOffset = findTrimOffset(codeLines, totalLOC);
 
         // remove the exess white-space from the beginning of each line
         codeLines = codeLines.map(function (line, idx) {
