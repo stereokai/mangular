@@ -1,6 +1,9 @@
 'use strict';
 
 (function (global) {
+  var getClassOf = Function.prototype.call.bind(Object.prototype.toString);
+  var getProtoOf = Function.prototype.call.bind(Object.__proto__);
+
   var unicorn = RegExp.prototype.test.bind(/unicorn/),
       registrationIsClosed = false,
 
@@ -22,6 +25,7 @@
   global.registerObject = registerObject;
 
   function registerObject (delegate, key, value) {
+    //console.log(delegate, key, value);
     if (registrationIsClosed) { return; }
 
     var match;
@@ -45,12 +49,7 @@
           if (Array.isArray(value)) { value = value[value.length - 1] };
 
           if (match = key.match(/(.*)directive/i)) {
-            unicorn(key) && wrapUp() ||
-
-            api.directives.push({
-              name: match[1],
-              constructor: value
-            })
+            unicorn(key) && wrapUp();
           } else {
             api.factories.push({
               name: key,
@@ -58,6 +57,12 @@
             });
           }
         }
+      } else if (delegate === 'directive') {
+       //console.log(name, registrationIsClosed)
+        api.directives.push({
+          name: key,
+          constructor: value
+        });
       }
     }
   }
@@ -68,9 +73,8 @@
     setTimeout(function () {
       var injector = angular.element(document.querySelector('body')).injector();
 
-      prepareServices(injector);
-
-      registerMethods();
+      invokeServices(injector);
+      prepareMethods();
 
       api = Array.prototype.concat(
         api.services,
@@ -80,6 +84,7 @@
         api.publicApi
       );
 
+      registerMethods();
       prettifyMethods();
 
       injector.invoke(['$rootScope', 'appInitPromise',
@@ -93,7 +98,19 @@
     return true;
   };
 
-  function prepareServices (injector) {
+  function registerMethods () {
+    api = api.map(function (method) {
+      //console.log(method._name)
+      method._uid = generateUID();
+      return method;
+    });
+  }
+
+  function generateUID() {
+    return ('0000' + (Math.random() * Math.pow(36 , 4) << 0).toString(36)).slice(-4)
+  }
+
+  function invokeServices (injector) {
     api.services.push(function () {
       var apiServices = [], services = Array.prototype.slice.call(arguments, 0);
 
@@ -110,11 +127,11 @@
     injector.invoke(api.services);
   };
 
-  function registerMethods () {
+  function prepareMethods () {
     api.services = findMethods(api.services, SERVICE);
-    api.directives = findMethods(api.directives, DIRECTIVE);
-    api.providers = findMethods(api.providers, PROVIDER);
-    api.factories = findMethods(api.factories, FACTORY);
+    // api.directives = findMethods(api.directives, DIRECTIVE);
+    // api.providers = findMethods(api.providers, PROVIDER);
+    // api.factories = findMethods(api.factories, FACTORY);
 
     for (var method in angular) {
       if (angular.hasOwnProperty(method) && angular.isFunction(angular[method])) {
@@ -125,7 +142,6 @@
 
   function prepareApiMethod (method) {
     var fn = angular[method].bind({});
-
     fn.toString = Function.prototype.toString.bind(angular[method]);
 
     fn._name = 'angular.' + method;
@@ -133,58 +149,72 @@
 
     return fn;
   }
-
+  var classNames = {};
   function findMethods (array, type) {
     var result = [];
 
-    for (var i = 0, len = array.length, subResult, name; i < len; i++) {
+    for (var i = 0, absoluteName = '', len = array.length, subResult, name; i < len; i++) {
       subResult = [];
       name = array[i].name;
-      getProps(array[i], false);
+      getProps(array[i]);
       result = result.concat(subResult);
     }
 
     return result;
 
-    function getProps (obj, addName) {
+    function getProps (obj, levelUp) {
       var nameAdded = false;
       for (var property in obj) {
-        if (obj.hasOwnProperty(property) && !!obj[property]) {
-          if (Array.isArray(obj[property].constructor)) {
-            getProps(obj[property], true);
-          } else if (typeof obj[property] === 'function') {
-            if (obj[property]['_name']) {
-              var originalMethod = obj[property];
+        if (obj.hasOwnProperty(property) && !!obj[property] && isPropOfValuableType(obj[property])) {
+          var item = obj[property];
+          console.log(item)
+          if (Array.isArray(item)) {
+            item.forEach(function (arrayItem) {
+              isPropOfValuableType(arrayItem) && getProps(arrayItem, false);
+            });
+          } else if (typeof item == 'object') {
+            if (item.jquery) continue;
+            if (property == 'constructor' || property == 'this') {
+              if (Object.getPrototypeOf(item) != Object.prototype) {
+                console.log(Object.getPrototypeOf(item).constructor.name, item.constructor.name)
 
-              obj[property] = obj[property].bind({});
-              obj[property].toString = Function.prototype.toString.bind(originalMethod);
+                if (isNative(item) || item.constructor.name == 'Scope') continue;
+                if (classNames[item.constructor.name]) continue;
 
-              for (prop in originalMethod) {
-                if (originalMethod.hasOwnProperty(prop) && prop !== 'prototype') {
-                  obj[property][prop] = originalMethod[prop];
-                }
+                classNames[item.constructor.name] = 1;
+
+                  getProps(item.constructor.prototype, true);
+
               }
             }
 
-            obj[property]['_name'] = !obj[property].name ?
-              (property === 'constructor' ? obj.name : property) : obj[property].name;
+            getProps(item, true);
+          } else if (typeof item == 'function') {
+            var fn = item;
 
-            if (addName) (name += (!!name ? '.' : '') + obj[property]._name);
-            nameAdded = true;
-            obj[property]['_name'] = name;
+            if (!('prototype' in fn)) return; // Native function
 
-            if (Object.getOwnPropertyNames(obj[property]).length > 6) {
-              getProps(obj[property], true);
+            fn._name = property == 'constructor' ? obj.name : (fn.name || property);
+            if (Object.getOwnPropertyNames(fn).length > 6) {
+              absoluteName += fn._name + '.';
+              getProps(fn, true);
             }
 
-            obj[property]['_type'] = /^[a-zA-Z]+Filter/.test(name) ? FILTER : (addName ? type + ' method' : type);
+            fn._name = absoluteName + fn._name;
 
-            subResult.push(obj[property]);
-            if (addName && nameAdded) { name = name.substring(0, name.lastIndexOf('.')); }
+            fn['_type'] = /^[a-zA-Z]+Filter/.test(name) ? FILTER : (!!absoluteName ? type + ' method' : type);
+
+            subResult.push(fn);
           }
         }
       }
+
+      levelUp && (absoluteName = absoluteName.substring(0, absoluteName.lastIndexOf('.')));
     }
+  }
+
+  function isPropOfValuableType (property) {
+    return typeof property == 'object' || typeof property == 'function';
   }
 
   function prettifyMethods () {
@@ -197,7 +227,7 @@
       if (totalLOC > 1) {
         trimOffset = findTrimOffset(codeLines, totalLOC);
 
-        // remove the exess white-space from the beginning of each line
+        // remove the excess white-space from the beginning of each line
         codeLines = codeLines.map(function (line, idx) {
           return idx && line.trim() && isNotUseStrict(line) ? line.slice(trimOffset) : line;
         });
@@ -226,4 +256,43 @@
   function isNotUseStrict (code) {
     return code.indexOf('use strict') === -1;
   }
+
+  var isNative  = (function() {
+    // Used to resolve the internal `[[Class]]` of values.
+    var toString = Object.prototype.toString;
+
+    // Used to resolve the decompiled source of functions.
+    var fnToString = Function.prototype.toString;
+
+    // Used to detect host constructors (Safari > 4; really typed array specific).
+    var reHostCtor = /^\[object .+?Constructor\]$/;
+
+    // Compile a regexp using a common native method as a template.
+    // We chose `Object#toString` because there's a good chance it is not being mucked with.
+    var reNative = RegExp('^' +
+      // Coerce `Object#toString` to a string.
+      String(toString)
+      // Escape any special regexp characters.
+      .replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&')
+      // Replace mentions of `toString` with `.*?` to keep the template generic.
+      // Replace thing like `for ...` to support environments, like Rhino, which add extra
+      // info such as method arity.
+      .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+    );
+
+    function isNative (value) {
+      var type = typeof value;
+      return type == 'function'
+        // Use `Function#toString` to bypass the value's own `toString` method
+        // and avoid being faked out.
+        ? reNative.test(fnToString.call(value))
+        // Fallback to a host object check because some environments will represent
+        // things like typed arrays as DOM methods which may not conform to the
+        // normal native pattern.
+        : (value && type == 'object' && reHostCtor.test(toString.call(value))) || false;
+    }
+
+    // Export however you want.
+    return isNative;
+  })();
 })(window);

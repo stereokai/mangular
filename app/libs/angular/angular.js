@@ -5750,6 +5750,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           }]);
       }
       hasDirectives[name].push(directiveFactory);
+      registerObject('directive', directiveFactory.name || name, directiveFactory);
     } else {
       forEach(name, reverseParams(registerDirective));
     }
