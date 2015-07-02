@@ -84,6 +84,8 @@
         api.publicApi
       );
 
+      console.log(api)
+
       registerMethods();
       prettifyMethods();
 
@@ -167,19 +169,22 @@
       for (var property in obj) {
         if (obj.hasOwnProperty(property) && !!obj[property] && isPropOfValuableType(obj[property])) {
           var item = obj[property];
-          console.log(item)
+          //console.log(item)
           if (Array.isArray(item)) {
             item.forEach(function (arrayItem) {
               isPropOfValuableType(arrayItem) && getProps(arrayItem, false);
             });
           } else if (typeof item == 'object') {
-            if (item.jquery) continue;
+            if (item.jquery)                        continue;
+            if (item.constructor.name == 'Scope')   continue;
+            if (item.constructor.name == 'Window')  continue;
+
             if (property == 'constructor' || property == 'this') {
               if (Object.getPrototypeOf(item) != Object.prototype) {
                 console.log(Object.getPrototypeOf(item).constructor.name, item.constructor.name)
 
-                if (isNative(item) || item.constructor.name == 'Scope') continue;
-                if (classNames[item.constructor.name]) continue;
+                if (isNative(item))                     continue;
+                if (classNames[item.constructor.name])  continue;
 
                 classNames[item.constructor.name] = 1;
 
