@@ -81,11 +81,11 @@
         api.directives,
         api.providers,
         api.factories,
-        api.publicApi
+        api.publicApi,
+        []
       );
-
       console.log(api)
-
+      window.API = api
       registerMethods();
       prettifyMethods();
 
@@ -102,7 +102,6 @@
 
   function registerMethods () {
     api = api.map(function (method) {
-      //console.log(method._name)
       method._uid = generateUID();
       return method;
     });
@@ -131,15 +130,60 @@
 
   function prepareMethods () {
     api.services = findMethods(api.services, SERVICE);
-    // api.directives = findMethods(api.directives, DIRECTIVE);
-    // api.providers = findMethods(api.providers, PROVIDER);
-    // api.factories = findMethods(api.factories, FACTORY);
+    api.directives = findMethods(api.directives, DIRECTIVE);
+    api.providers = findMethods(api.providers, PROVIDER);
+    api.factories = findMethods(api.factories, FACTORY);
 
     for (var method in angular) {
       if (angular.hasOwnProperty(method) && angular.isFunction(angular[method])) {
         api.publicApi.push(prepareApiMethod(method))
       }
     }
+  };
+
+  function AbsoluteName (name) {
+    if (name) {
+      this.set(name);
+    }
+
+    return name;
+  }
+
+  AbsoluteName.prototype = {
+    set: function set (name) {
+      if (typeof name == 'string') {
+        this.name = name;
+
+        var _this = this,
+            proto = {};
+
+        AbsoluteName.prototype.stringPrototype.forEach(function (fn) {
+          proto[fn] = String.prototype[fn].bind(_this.name);
+        })
+
+        proto.length = function length () { return _this.name.length; };
+
+        this.__proto__ = angular.extend(proto, AbsoluteName.prototype);
+
+        return name;
+      } else {
+        throw Error('name is no a string');
+      }
+    },
+
+    append: function append (name) {
+      this.set(this.name + '.' + name);
+
+      return this.name;
+    },
+
+    levelUp: function levelUp () {
+      this.set(this.name.substring(0, this.name.lastIndexOf('.')));
+      return this.name;
+    },
+
+    // Save all properties of String prototype bar length
+    stringPrototype: Object.getOwnPropertyNames(String.prototype).splice(1)
   };
 
   function prepareApiMethod (method) {
@@ -151,75 +195,78 @@
 
     return fn;
   }
+
   var classNames = {};
-  function findMethods (array, type) {
+  function findMethods (haystack, type) {
     var result = [];
 
-    for (var i = 0, absoluteName = '', len = array.length, subResult, name; i < len; i++) {
+    for (var i = 0, absoluteName = new AbsoluteName(), len = haystack.length, subResult, name; i < len; i++) {
       subResult = [];
-      name = array[i].name;
-      getProps(array[i]);
+      name = absoluteName.set(haystack[i].name);
+      getProps(haystack[i]);
       result = result.concat(subResult);
     }
 
     return result;
 
-    function getProps (obj, levelUp) {
-      var nameAdded = false;
+    function getProps (obj) {
+      if (typeof obj == 'function') {
+        saveMethod(obj, absoluteName, type, subResult);
+      }
+
       for (var property in obj) {
-        if (obj.hasOwnProperty(property) && !!obj[property] && isPropOfValuableType(obj[property])) {
-          var item = obj[property];
-          //console.log(item)
-          if (Array.isArray(item)) {
-            item.forEach(function (arrayItem) {
-              isPropOfValuableType(arrayItem) && getProps(arrayItem, false);
+        if (obj.hasOwnProperty(property) && isPropOfValuableType(obj[property])) {
+          var suspect = obj[property];
+
+          if (Array.isArray(suspect)) {
+            suspect.forEach(function (item) {
+              isPropOfValuableType(item) && getProps(item);
             });
-          } else if (typeof item == 'object') {
-            if (item.jquery)                        continue;
-            if (item.constructor.name == 'Scope')   continue;
-            if (item.constructor.name == 'Window')  continue;
+          } else if (typeof suspect == 'object') {
+            if (suspect.jquery)                                continue;
+            if (suspect.constructor.name == 'Scope')           continue;
+            if (suspect.constructor.name == 'Window')          continue;
+            if (name == '$route' && property != 'constructor') continue;
 
-            if (property == 'constructor' || property == 'this') {
-              if (Object.getPrototypeOf(item) != Object.prototype) {
-                console.log(Object.getPrototypeOf(item).constructor.name, item.constructor.name)
-
-                if (isNative(item))                     continue;
-                if (classNames[item.constructor.name])  continue;
-
-                classNames[item.constructor.name] = 1;
-
-                  getProps(item.constructor.prototype, true);
-
-              }
+            getProps(suspect);
+          } else if (typeof suspect == 'function') {
+            if (property != 'constructor' &&
+                (!suspect.name || absoluteName.toString() != suspect.name)) {
+                  var shouldLevelUp = true;
+                  absoluteName.append(suspect.name || property);
             }
 
-            getProps(item, true);
-          } else if (typeof item == 'function') {
-            var fn = item;
+            saveMethod(suspect, absoluteName, type, subResult);
 
-            if (!('prototype' in fn)) return; // Native function
-
-            fn._name = property == 'constructor' ? obj.name : (fn.name || property);
-            if (Object.getOwnPropertyNames(fn).length > 6) {
-              absoluteName += fn._name + '.';
-              getProps(fn, true);
-            }
-
-            fn._name = absoluteName + fn._name;
-
-            fn['_type'] = /^[a-zA-Z]+Filter/.test(name) ? FILTER : (!!absoluteName ? type + ' method' : type);
-
-            subResult.push(fn);
+            shouldLevelUp && absoluteName.levelUp();
           }
         }
       }
-
-      levelUp && (absoluteName = absoluteName.substring(0, absoluteName.lastIndexOf('.')));
     }
   }
 
-  function isPropOfValuableType (property) {
-    return typeof property == 'object' || typeof property == 'function';
+  function saveMethod (_fn, derivedName, type, subResult) {
+    if (!('prototype' in _fn)) {
+      return; // Native function
+    }
+
+    var fn = _fn.bind({});
+
+    fn.toString = Function.prototype.toString.bind(_fn);
+
+    fn._name = derivedName.toString();
+
+    // if (Object.getOwnPropertyNames(fn).length > 6) {
+    //   getProps(fn);
+    // }
+
+    fn['_type'] = /^[a-zA-Z]+Filter/.test(name) ? FILTER : (fn._name.indexOf('.') > 0 ? type + ' method' : type);
+
+    subResult.push(fn);
+  }
+
+  function isPropOfValuableType (item) {
+    return typeof item == 'object' || typeof item == 'function' || Array.isArray(item);
   }
 
   function prettifyMethods () {
