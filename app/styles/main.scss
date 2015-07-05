@@ -94,12 +94,12 @@ body {
 
 .main {
   position: relative;
-  height: 100%;
+  height: calc(100% - 85px);
   background: #3a3636;
   background: #272822;
   box-shadow: inset 0px 0px 18px 0px rgba(0, 0, 0, 0.75);
 
-  & > p, & > div {
+  & > p, & > div:not(.container) {
     padding: 20px 50px 0;
   }
 }

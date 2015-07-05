@@ -1,9 +1,6 @@
 'use strict';
 
 (function (global) {
-  var getClassOf = Function.prototype.call.bind(Object.prototype.toString);
-  var getProtoOf = Function.prototype.call.bind(Object.__proto__);
-
   var unicorn = RegExp.prototype.test.bind(/unicorn/),
       registrationIsClosed = false,
 
@@ -81,11 +78,11 @@
         api.directives,
         api.providers,
         api.factories,
-        api.publicApi,
-        []
+        api.publicApi
       );
-      console.log(api)
-      window.API = api
+
+      window.API = api;
+
       registerMethods();
       prettifyMethods();
 
@@ -141,51 +138,6 @@
     }
   };
 
-  function AbsoluteName (name) {
-    if (name) {
-      this.set(name);
-    }
-
-    return name;
-  }
-
-  AbsoluteName.prototype = {
-    set: function set (name) {
-      if (typeof name == 'string') {
-        this.name = name;
-
-        var _this = this,
-            proto = {};
-
-        AbsoluteName.prototype.stringPrototype.forEach(function (fn) {
-          proto[fn] = String.prototype[fn].bind(_this.name);
-        })
-
-        proto.length = function length () { return _this.name.length; };
-
-        this.__proto__ = angular.extend(proto, AbsoluteName.prototype);
-
-        return name;
-      } else {
-        throw Error('name is no a string');
-      }
-    },
-
-    append: function append (name) {
-      this.set(this.name + '.' + name);
-
-      return this.name;
-    },
-
-    levelUp: function levelUp () {
-      this.set(this.name.substring(0, this.name.lastIndexOf('.')));
-      return this.name;
-    },
-
-    // Save all properties of String prototype bar length
-    stringPrototype: Object.getOwnPropertyNames(String.prototype).splice(1)
-  };
-
   function prepareApiMethod (method) {
     var fn = angular[method].bind({});
     fn.toString = Function.prototype.toString.bind(angular[method]);
@@ -196,7 +148,6 @@
     return fn;
   }
 
-  var classNames = {};
   function findMethods (haystack, type) {
     var result = [];
 
@@ -255,10 +206,6 @@
     fn.toString = Function.prototype.toString.bind(_fn);
 
     fn._name = derivedName.toString();
-
-    // if (Object.getOwnPropertyNames(fn).length > 6) {
-    //   getProps(fn);
-    // }
 
     fn['_type'] = /^[a-zA-Z]+Filter/.test(name) ? FILTER : (fn._name.indexOf('.') > 0 ? type + ' method' : type);
 
@@ -347,4 +294,49 @@
     // Export however you want.
     return isNative;
   })();
+
+  function AbsoluteName (name) {
+    if (name) {
+      this.set(name);
+    }
+
+    return name;
+  }
+
+  AbsoluteName.prototype = {
+    set: function set (name) {
+      if (typeof name == 'string') {
+        this.name = name;
+
+        var _this = this,
+            proto = {};
+
+        AbsoluteName.prototype.stringPrototype.forEach(function (fn) {
+          proto[fn] = String.prototype[fn].bind(_this.name);
+        })
+
+        proto.length = function length () { return _this.name.length; };
+
+        this.__proto__ = angular.extend(proto, AbsoluteName.prototype);
+
+        return name;
+      } else {
+        throw Error('name is no a string');
+      }
+    },
+
+    append: function append (name) {
+      this.set(this.name + '.' + name);
+
+      return this.name;
+    },
+
+    levelUp: function levelUp () {
+      this.set(this.name.substring(0, this.name.lastIndexOf('.')));
+      return this.name;
+    },
+
+    // Save all properties of String prototype bar length
+    stringPrototype: Object.getOwnPropertyNames(String.prototype).splice(1)
+  };
 })(window);

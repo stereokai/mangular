@@ -50,6 +50,14 @@ angular.module('mangular')
         editorStyleSheet = styleEl.sheet;
         editorStyleSheet.insertRule('.ace_editor { font-family: inconsolata, Menlo, Monaco, Consolas, "Courier New", monospace }', editorStyleSheet.cssRules.length);
 
+        var container = $el[0].parentElement;
+        Ps.initialize(container);
+
+        window.updatePs = function () {
+          container.scrollTop = 0;
+          Ps.update(container);
+        }
+
         $scope.$watch('selectedMethod', function (newMethod, oldMethod) {
           if (newMethod) {
             editor.setOptions({

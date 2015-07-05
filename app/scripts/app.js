@@ -16,8 +16,7 @@ angular
     'ngRoute',
     'ngSanitize',
     'ngTouch',
-    'unicorn-directive',
-    'sun.scrollable'
+    'unicorn-directive'
   ])
 
   .config(['$locationProvider', '$httpProvider', function ($locationProvider, $httpProvider) {
