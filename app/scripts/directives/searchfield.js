@@ -11,9 +11,16 @@ angular.module('mangular')
     return {
       restrict: 'A',
       link: function searchField ($scope, $el, $attrs) {
+        function choose () {
+          $scope.q._name = $scope.selectedMethod._name;
+        }
+
+        $scope.choose = choose;
+
         $scope.keypress = function (e) {
-          if ((e.keyCode || e.which) === 13) {
+          if ((e.keyCode || e.which) === 13 || (e.keyCode || e.which) === 9) {
             e.preventDefault();
+            choose();
           }
         }
 

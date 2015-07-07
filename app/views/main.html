@@ -5,11 +5,13 @@
     type="search"
     ng-model="q._name"
     ng-keypress="keypress($event)"
+    ng-blur="choose()"
     placeholder="Search for api method"
+    size="{{q._name.length}}"
      />
 </p>
 
-<div>
+<div class="method-list-box">
   <ul class="method-list list-group" data-list>
     <li class="list-group-item" ng-repeat="method in api | filter:q track by method._uid" ng-click="doIt(this)">
       {{method._name}} - {{method._type}}
@@ -18,5 +20,5 @@
 </div>
 
 <div class="container">
-  <code-view></code-view>
+  <code-view model="q._name"></code-view>
 </div>

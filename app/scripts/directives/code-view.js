@@ -53,21 +53,22 @@ angular.module('mangular')
         var container = $el[0].parentElement;
         Ps.initialize(container);
 
-        window.updatePs = function () {
-          container.scrollTop = 0;
-          Ps.update(container);
-        }
-
         $scope.$watch('selectedMethod', function (newMethod, oldMethod) {
-          if (newMethod) {
+          if (newMethod && (!oldMethod || newMethod._name != oldMethod._name)) {
             editor.setOptions({
                 minLines: newMethod.loc + 1,
                 maxLines: Infinity
             });
 
             editor.setValue(newMethod.code);
+
             editor.getSelection().clearSelection();
             editor.gotoLine(1);
+
+            container.scrollTop = 0;
+            setTimeout(function() {
+              Ps.update(container);
+            }, 0);
 
             setTimeout(shine, 1000);
           }

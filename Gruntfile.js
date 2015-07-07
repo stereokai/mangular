@@ -261,6 +261,16 @@ module.exports = function (grunt) {
       }
     },
 
+    uncss: {
+      dist: {
+        src: ['app/views/**/*.html'],
+        dest: '.tmp/styles/main.css',
+        options: {
+          stylesheets: ['../../.tmp/styles/main.css']
+        }
+      }
+    },
+
     // Renames files for browser caching purposes
     filerev: {
       dist: {
@@ -513,6 +523,7 @@ module.exports = function (grunt) {
         'ngAnnotate',
         'copy:dist',
         'cdnify',
+        'uncss',
         'cssmin',
         'uglify',
         'filerev',
