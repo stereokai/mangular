@@ -12,9 +12,9 @@
 </p>
 
 <div class="method-list-box">
-  <ul class="method-list list-group" data-list>
-    <li class="list-group-item" ng-repeat="method in api | filter:q track by method._uid" ng-click="doIt(this)">
-      {{method._name}} - {{method._type}}
+  <ul class="method-list " data-list>
+    <li class="method-button {{method._type.toLowerCase()}}" ng-repeat="method in api | filter:q track by method._uid" ng-click="doIt(this)">
+      {{method._name}}
     </li>
   </ul>
 </div>
